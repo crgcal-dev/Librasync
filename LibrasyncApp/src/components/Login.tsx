@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import logo from '../../public/login-logo.png'
+import logo from '../assets/login-logo.png'
 
 const Login = () => {
     const [time, setTime] = useState("");

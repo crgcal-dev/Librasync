@@ -1,4 +1,4 @@
-import profile from '../../public/profile.png'
+import profile from '../assets/profile.png'
 import { MenuItemType } from '../types/MenuItemType';
 
 export const Menu = () =>{
@@ -35,7 +35,7 @@ export const MenuItem = ( { name }:MenuItemType ) =>{
     
     return(
         <div className='flex flex-col items-center'>
-            <a className='p-5 text-white font-semibold w-80' href={pathWay()} id='menu'>{name}</a>
+            <a className='p-5 text-white font-semibold w-80' href={pathWay()}>{name}</a>
             <hr className="divide-white w-72"/>
         </div>
     )
