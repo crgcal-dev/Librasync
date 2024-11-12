@@ -1,0 +1,6 @@
+@LibrasyncAPI_HostAddress = http://localhost:5019
+
+GET {{LibrasyncAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
