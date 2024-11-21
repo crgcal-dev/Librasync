@@ -1,158 +1,154 @@
 import { useEffect, useState } from "react";
-import { Menu } from "./Menu";
-import { Book } from "../types/BookType"
-import Background from "./Background";
+import Header from "./Header";
+import { Books } from "../types/Books";
+import Download  from "../assets/download.svg"
 
-const BookCatalog = () =>{
-    const [books, setBook] = useState<Book[]>([]);
-    const [bookData, setBookData] = useState<Book>({
-        id: 0,
-        bookID: "",
-        title: "",
-        author: "",
-        genre: "",
-        publisher: "",
-        publicationDate: "",
-        edition: "",
-        language: "",
-        isAvailable: true,
-    });
+const BookCatalog = () => {
+    const [books, setBooks] = useState<Books[]>([]);
+    const [search, setSearch] = useState("");
+    const [selectedGenre, setSelectedGenre] = useState("");
+    const [selectedAvailability, setSelectedAvailability] = useState("");
 
-    useEffect(() => {
-        const fetchBookData = async () =>{
-            try {
-                const response = await fetch("http://localhost:5019/api/book");
-                const data: Book[] = await response.json();
-                
-                setBook(data);
-            } catch (error) {
-                console.error("Failed to fetch book data.");
-            }
-        }
-
-        fetchBookData();
-    }, [])
-
-    const handleAdd = async (e:any) =>{
-        e.preventDefault();
-
+    const fetchBookData = async () => {
         try {
-            const response = await fetch("http://localhost:5019/api/book/create",{
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(bookData)
-            })
-
+            const response = await fetch("http://localhost:5019/api/book");
+            
             if (response.ok) {
-                setBookData({
-                    id: 0,
-                    bookID: "",
-                    title: "",
-                    author: "",
-                    genre: "",
-                    publisher: "",
-                    publicationDate: "",
-                    edition: "",
-                    language: "",
-                    isAvailable: true,
-                })
+                const data: Books[] = await response.json();
+                setBooks(data);
             } else {
-                console.error("Failed to add new book. Status:", response.status);
+                console.error(`Error: ${response.status} ${response.statusText}`);
             }
         } catch (error) {
-            console.error("Failed to add new book.", error);
+            console.error("Failed to fetch book data.", error);
         }
-    }
-
-    const handleInputChange = (e: any) => {
-        const { name, value } = e.target;
-        setBookData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
     };
 
-    return(
-        <div className="flex">
-            <Background />
-            <Menu/>
-            <div className="flex flex-col justify-between py-10 items-center w-screen z-10">
-                <div className="h-96 w-[100rem] min-w-96 overflow-y-scroll border border-gray-300">
-                    <table className="border-collapse border border-gray-300 w-full h-96 overflow-y-scroll">
-                        <thead className="sticky top-0 bg-sky-500 text-white ">
-                            <tr className="border border-red-300">
-                                <th className="border text-sm p-2 ">Book ID</th>
-                                <th className="border w-1/6 text-sm p-2">Title</th>
-                                <th className="border w-1/6 text-sm p-2">Author</th>
-                                <th className="border text-sm p-2">Genre</th>
-                                <th className="border w-1/6 text-sm p-2">Publisher</th>
-                                <th className="border text-sm p-2">Pulication Date</th>
-                                <th className="border text-sm p-2">Edition</th>
-                                <th className="border text-sm p-2">Language</th>
-                                <th className="border text-sm p-2">Availability Status</th>
+    useEffect(() => {
+        fetchBookData();
+    }, []);
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+    };
+
+    const handleGenreChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedGenre(e.target.value);
+    };
+
+    const handleAvailabilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedAvailability(e.target.value);
+    };
+
+    const filteredBooks = books.filter(book => {
+        const matchesSearch = book.title.toLowerCase().includes(search.toLowerCase());
+        const matchesGenre = selectedGenre ? book.genre === selectedGenre : true;
+        const matchesAvailability = selectedAvailability
+            ? (selectedAvailability === "Available" ? book.availability : !book.availability)
+            : true;
+
+        return matchesSearch && matchesGenre && matchesAvailability;
+    });
+
+    return (
+        <div>
+            <Header />
+            <div className="flex flex-col items-center pt-10 gap-3 h-[55.5rem]">
+                <div className="flex flex-col pb-5 w-full px-40">
+                    <p className="font-bold text-2xl text-left text-slate-800">Book Catalog</p>
+                    <hr className="bg-gray-300 w-full h-0.5"/>
+                </div>
+                <div className="flex items-center w-full px-40 justify-between">
+                    <div className="flex gap-10">
+                        <div className="flex gap-2 items-center">
+                            <p className="text-sm font-semibold">Find a book: </p>
+                            <input
+                                className="text-sm border px-2 rounded-sm py-1"
+                                type="search"
+                                placeholder="Input a title here"
+                                value={search}
+                                onChange={handleSearchChange}
+                            />
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            <p className="text-sm font-semibold">Select Genre: </p>
+                            <select
+                                className="border text-sm rounded-sm w-52 py-1"
+                                value={selectedGenre}
+                                onChange={handleGenreChange}
+                            >
+                                <option value="">All</option>
+                                {[...new Set(books.map(book => book.genre))].map(genre => (
+                                    <option key={genre} value={genre}>
+                                        {genre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            <p className="text-sm font-semibold">Availability:</p>
+                            <select
+                                className="border text-sm w-52 py-1"
+                                value={selectedAvailability}
+                                onChange={handleAvailabilityChange}
+                            >
+                                <option value="">All</option>
+                                <option value="Available">Available</option>
+                                <option value="Booked">Booked</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="flex gap-2 text-white">
+                        <button className="text-sm bg-green-600 px-3 py-1.5 rounded-sm flex gap-2 items-center justify-center">
+                            <img className="h-5 " src={Download} /> Download Report
+                        </button>
+                    </div>
+                </div>
+                <div className="max-h-[45rem] overflow-y-scroll border">
+                    <table className="w-[100rem] font-thin">
+                        <thead className="bg-gray-200 h-14 text-sm sticky top-0">
+                            <tr className="text-slate-800">
+                                <th className="border border-gray-300">Book ID</th>
+                                <th className="border border-gray-300">Title</th>
+                                <th className="border border-gray-300">Author</th>
+                                <th className="border border-gray-300">Genre</th>
+                                <th className="border border-gray-300">Publisher</th>
+                                <th className="border border-gray-300">Publication Date</th>
+                                <th className="border border-gray-300">Edition</th>
+                                <th className="border border-gray-300">Language</th>
+                                <th className="border border-gray-300">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="overflow-y-scroll border">
-                            {books.map((book) => (
-                                <tr  key={book.id} className="border pt-5 border-red-300">
-                                    <td className="border text-sm p-2">{book.bookID}</td>
-                                    <td className="border text-sm p-2">{book.title}</td>
-                                    <td className="border text-sm p-2">{book.author}</td>
-                                    <td className="border text-sm p-2">{book.genre}</td>
-                                    <td className="border text-sm p-2">{book.publisher}</td>
-                                    <td className="border text-sm p-2">{new Date(book.publicationDate).toLocaleDateString()}</td>
-                                    <td className="border text-sm p-2">{book.edition}</td>
-                                    <td className="border text-sm p-2">{book.language}</td>
-                                    <td className="border text-sm p-2">{book.isAvailable ? "Available" : "Not Available"}</td>
+                        <tbody>
+                            {filteredBooks.length > 0 ? (
+                                filteredBooks.map((book) => (
+                                    <tr key={book.id} className="border text-center text-sm h-14">
+                                        <td className="border text-sky-600">{book.bookID}</td>
+                                        <td className="border">{book.title}</td>
+                                        <td className="border text-sky-600">{book.author}</td>
+                                        <td className="border">{book.genre}</td>
+                                        <td className="border">{book.publisher}</td>
+                                        <td className="border">{new Date(book.publicationDate).toLocaleDateString()}</td>
+                                        <td className="border">{book.edition}</td>
+                                        <td className="border">{book.language}</td>
+                                        <td className={`border font-semibold ${book.availability ? 'text-green-600' : 'text-red-600'}`}>
+                                            {book.availability ? 'Available' : 'Booked'}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={9} className="text-center p-5">
+                                        No books available.
+                                    </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
-
-                <div className="flex flex-col w-[30rem] h-[33rem] border border-gray-300 gap-5 justify-center items-center">
-                    <h1 className="font-semibold">BOOK INFORMATION</h1>
-                    <div className="flex gap-2 items-center w-96 justify-between">
-                        <p className="text-sm font-semibold">Book ID: </p>
-                        <input className="border w-60" type="text" onChange={handleInputChange} value={bookData.bookID} name="bookID"/>
-                    </div>
-                    <div className="flex gap-2 items-center w-96 justify-between">
-                        <p className="text-sm font-semibold">Title: </p>
-                        <input className="border w-60" type="text" onChange={handleInputChange} value={bookData.title} name="title"/>
-                    </div>
-                    <div className="flex gap-2 items-center w-96 justify-between">
-                        <p className="text-sm font-semibold">Author: </p>
-                        <input className="border w-60" type="text" onChange={handleInputChange} value={bookData.author} name="author"/>
-                    </div>
-                    <div className="flex gap-2 items-center w-96 justify-between">
-                        <p className="text-sm font-semibold">Genre: </p>
-                        <input className="border w-60" type="text" onChange={handleInputChange} value={bookData.genre} name="genre"/>
-                    </div>
-                    <div className="flex gap-2 items-center w-96 justify-between">
-                        <p className="text-sm font-semibold">Publisher: </p>
-                        <input className="border w-60" type="text" onChange={handleInputChange} value={bookData.publisher} name="publisher"/>
-                    </div>
-                    <div className="flex gap-2 items-center w-96 justify-between">
-                        <p className="text-sm font-semibold">Publication Date: </p>
-                        <input className="border w-60" type="date" onChange={handleInputChange} value={bookData.publicationDate} name="publicationDate"/>
-                    </div>
-                    <div className="flex gap-2 items-center w-96 justify-between">
-                        <p className="text-sm font-semibold">Edition: </p>
-                        <input className="border w-60" type="text" onChange={handleInputChange} value={bookData.edition} name="edition"/>
-                    </div>
-                    <div className="flex gap-2 items-center w-96 justify-between">
-                        <p className="text-sm font-semibold">Language: </p>
-                        <input className="border w-60" type="text" onChange={handleInputChange} value={bookData.language} name="language"/>
-                    </div>
-                    <div className="flex gap-5">
-                        <button className="border bg-green-500 text-white h-12 w-32 text-sm font-semibold" onClick={handleAdd}>ADD</button>
-                        <button className="border bg-orange-500 text-white h-12 w-32 text-sm font-semibold">UPDATE</button>
-                        <button className="border bg-red-500 text-white h-12 w-32 text-sm font-semibold">DELETE</button>
-                    </div>
-                </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default BookCatalog;
