@@ -3,15 +3,16 @@ import Menu from "../assets/menu.svg";
 import Profile from "../assets/profile.png";
 import Logout from "../assets/logout.svg";
 import Sidebar from "./Sidebar";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const navigate = useNavigate();
 
   const menuItems = [
-    { label: "Catalog", onClick: () => console.log("Catalog clicked") },
-    { label: "Manage Books", onClick: () => console.log("Catalog clicked") },
+    { label: "Catalog", onClick: () => navigate("/book-catalog") },
+    { label: "Manage Books", onClick: () => navigate("/manage-books") },
     { label: "Reserved Books", onClick: () => console.log("Reserved Books clicked") },
     { label: "Returned Books", onClick: () => console.log("Returned Books clicked") },
     { label: "Add Member", onClick: () => console.log("Returned Books clicked") },
@@ -20,7 +21,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="flex h-16 px-2 justify-between bg-gray-200">
+      <div className="flex h-16 px-2 justify-between bg-gray-200 sticky top-0">
         <button
           className="flex justify-center items-center"
           onClick={toggleSidebar}

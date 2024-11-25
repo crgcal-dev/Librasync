@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import Header from "./Header";
-import { Books } from "../types/Books";
-import Download  from "../assets/download.svg"
+import Header from "../Header";
+import { Books } from "../../types/Books";
+import Download  from "../../assets/download.svg"
 
 const BookCatalog = () => {
     const [books, setBooks] = useState<Books[]>([]);
@@ -53,7 +53,7 @@ const BookCatalog = () => {
     return (
         <div>
             <Header />
-            <div className="flex flex-col items-center pt-10 gap-3 h-[55.5rem]">
+            <div className="flex flex-col items-center pt-5 gap-3">
                 <div className="flex flex-col pb-5 w-full px-40">
                     <p className="font-bold text-2xl text-left text-slate-800">Book Catalog</p>
                     <hr className="bg-gray-300 w-full h-0.5"/>
@@ -63,7 +63,7 @@ const BookCatalog = () => {
                         <div className="flex gap-2 items-center">
                             <p className="text-sm font-semibold">Find a book: </p>
                             <input
-                                className="text-sm border px-2 rounded-sm py-1"
+                                className="text-sm border px-2 rounded-md py-1"
                                 type="search"
                                 placeholder="Input a title here"
                                 value={search}
@@ -73,7 +73,7 @@ const BookCatalog = () => {
                         <div className="flex gap-2 items-center">
                             <p className="text-sm font-semibold">Select Genre: </p>
                             <select
-                                className="border text-sm rounded-sm w-52 py-1"
+                                className="border text-sm rounded-md w-52 py-1 px-1"
                                 value={selectedGenre}
                                 onChange={handleGenreChange}
                             >
@@ -88,7 +88,7 @@ const BookCatalog = () => {
                         <div className="flex gap-2 items-center">
                             <p className="text-sm font-semibold">Availability:</p>
                             <select
-                                className="border text-sm w-52 py-1"
+                                className="border text-sm w-52 py-1 rounded-md px-1"
                                 value={selectedAvailability}
                                 onChange={handleAvailabilityChange}
                             >
@@ -104,7 +104,7 @@ const BookCatalog = () => {
                         </button>
                     </div>
                 </div>
-                <div className="max-h-[45rem] overflow-y-scroll border">
+                <div className="max-h-[43rem] overflow-y-scroll border">
                     <table className="w-[100rem] font-thin">
                         <thead className="bg-gray-200 h-14 text-sm sticky top-0">
                             <tr className="text-slate-800">
