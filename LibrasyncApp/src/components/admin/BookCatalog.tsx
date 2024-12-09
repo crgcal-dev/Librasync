@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import Header from "../Header";
 import { Books } from "../../types/Books";
 import Download  from "../../assets/download.svg"
+import UpdateBook from "../modals/UpdateBookModal";
 
 const BookCatalog = () => {
     const [books, setBooks] = useState<Books[]>([]);
     const [search, setSearch] = useState("");
     const [selectedGenre, setSelectedGenre] = useState("");
     const [selectedAvailability, setSelectedAvailability] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedBook, setSelectedBook] = useState(null);
 
     const fetchBookData = async () => {
         try {
@@ -49,6 +52,11 @@ const BookCatalog = () => {
 
         return matchesSearch && matchesGenre && matchesAvailability;
     });
+
+    const handleUpdateBook = (book: any) => {
+        setSelectedBook(book);
+        setIsModalOpen(true);
+    }
 
     return (
         <div>
@@ -123,7 +131,7 @@ const BookCatalog = () => {
                             {filteredBooks.length > 0 ? (
                                 filteredBooks.map((book) => (
                                     <tr key={book.id} className="border text-center text-sm h-14">
-                                        <td className="border text-sky-600">{book.bookID}</td>
+                                        <td className="border text-sky-600 cursor-pointer" onClick={() => handleUpdateBook(book)}>{book.bookID}</td>
                                         <td className="border">{book.title}</td>
                                         <td className="border text-sky-600">{book.author}</td>
                                         <td className="border">{book.genre}</td>
@@ -146,6 +154,12 @@ const BookCatalog = () => {
                         </tbody>
                     </table>
                 </div>
+                {isModalOpen && 
+                    <UpdateBook 
+                        isOpen={isModalOpen} 
+                        onClose={() => setIsModalOpen(false)}
+                        book={selectedBook}
+                />}
             </div>
         </div>
     );
